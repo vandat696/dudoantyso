@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
   const resultMessage = document.getElementById('result-message');
   const betStatusMessage = document.getElementById('bet-status-message');
   const matchTimeElement = document.getElementById('match-time');
+  const balanceElement = document.getElementById('balance');
+  const betAmountInput = document.getElementById('bet-amount');
 
+  let balance = 100000;  // Số tiền ban đầu
   let isMatchEnded = false; // Trạng thái trận đấu đã kết thúc
   let isMatchStarted = false; // Trạng thái trận đấu đã diễn ra
 
@@ -56,6 +59,32 @@ document.addEventListener('DOMContentLoaded', function () {
         // Trận đấu đã kết thúc
         scoreElement.textContent = `${data.score.homeTeam} - ${data.score.awayTeam}`;
         betStatusMessage.textContent = 'Trận đấu đã kết thúc!';
+
+        // Cập nhật số tiền dựa trên kết quả cược
+        const homePrediction = parseInt(homePredictionInput.value, 10);
+        const awayPrediction = parseInt(awayPredictionInput.value, 10);
+        const betAmount = parseInt(betAmountInput.value, 10);
+
+        if (isNaN(homePrediction) || isNaN(awayPrediction) || isNaN(betAmount)) {
+          resultMessage.textContent = 'Vui lòng nhập đầy đủ thông tin cược.';
+          return;
+        }
+
+        if (betAmount > balance) {
+          resultMessage.textContent = 'Số tiền cược vượt quá số dư của bạn!';
+          return;
+        }
+
+        // Tính toán kết quả cược
+        if (homePrediction === data.score.homeTeam && awayPrediction === data.score.awayTeam) {
+          balance += betAmount * 2;  // Nếu đúng, người chơi thắng gấp đôi số tiền cược
+          resultMessage.textContent = `Chúc mừng! Bạn đã dự đoán đúng. Bạn đã thắng ${betAmount * 2} đồng.`;
+        } else {
+          balance -= betAmount;  // Nếu sai, người chơi mất số tiền cược
+          resultMessage.textContent = `Rất tiếc, bạn đã dự đoán sai. Bạn đã mất ${betAmount} đồng.`;
+        }
+
+        updateBalance();  // Cập nhật số tiền
       } else {
         resultMessage.textContent = 'Không xác định được trạng thái trận đấu.';
       }
@@ -65,9 +94,36 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // Cập nhật số tiền
+  function updateBalance() {
+    balanceElement.textContent = `Số tiền hiện tại: ${balance.toLocaleString()} đồng`;
+  }
+
   // Gọi hàm để tải thông tin trận đấu khi trang web load
   updateMatchResult();
 
   // Sử dụng Polling để cập nhật kết quả trận đấu mỗi 10 giây
   setInterval(updateMatchResult, 10000);  // Cập nhật mỗi 10 giây
+
+  // Sự kiện khi người chơi đặt cược
+  placeBetButton.addEventListener('click', function () {
+    const homePrediction = parseInt(homePredictionInput.value, 10);
+    const awayPrediction = parseInt(awayPredictionInput.value, 10);
+    const betAmount = parseInt(betAmountInput.value, 10);
+
+    if (isNaN(homePrediction) || isNaN(awayPrediction) || isNaN(betAmount)) {
+      resultMessage.textContent = 'Vui lòng nhập đầy đủ thông tin cược.';
+      return;
+    }
+
+    if (betAmount > balance) {
+      resultMessage.textContent = 'Số tiền cược vượt quá số dư của bạn!';
+      return;
+    }
+
+    balance -= betAmount; // Trừ số tiền cược
+    updateBalance(); // Cập nhật số tiền
+
+    resultMessage.textContent = 'Đang chờ kết quả trận đấu...';
+  });
 });
