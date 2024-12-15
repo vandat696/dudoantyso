@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Dự Đoán Tỉ Số Bóng Đá</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Dự Đoán Tỉ Số Ngoại Hạng Anh</h1>
+
+    <div id="match-info">
+      <h2>Trận đấu hiện tại:</h2>
+      <p><strong>Đội nhà:</strong> <span id="home-team"></span></p>
+      <p><strong>Đội khách:</strong> <span id="away-team"></span></p>
+      <p><strong>Tỉ số:</strong> <span id="score"></span></p>
+    </div>
+
+    <div id="bet-form">
+      <h2>Đặt cược:</h2>
+      <label for="home-prediction">Dự đoán tỉ số đội nhà:</label>
+      <input type="number" id="home-prediction" placeholder="Tỉ số đội nhà" min="0">
+      
+      <label for="away-prediction">Dự đoán tỉ số đội khách:</label>
+      <input type="number" id="away-prediction" placeholder="Tỉ số đội khách" min="0">
+
+      <button id="place-bet">Đặt cược</button>
+
+      <p id="result-message"></p>
+    </div>
+    <div id="bet-status-message"></div> <!-- Thông báo trạng thái trận đấu -->
+    <div id="result-message"></div> <!-- Thông báo kết quả dự đoán -->
+    <p id="match-time"></p> <!-- Hiển thị thời gian trận đấu -->
+
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
