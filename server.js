@@ -93,7 +93,7 @@ app.post('/api/place-bet', (req, res) => {
   session[userId].points -= betAmount;
 
   res.json({
-    message: 'Đặt cược thành công!',
+    message: 'Dự đoán thành công!',
     remainingPoints: session[userId].points,
   });
 });

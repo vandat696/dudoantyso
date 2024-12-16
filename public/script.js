@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
       matchStatus = data.status;
 
       if (matchStatus === 'IN_PLAY') {
-        betStatusMessage.textContent = 'Trận đấu đang diễn ra, không thể đặt cược nữa!';
+        betStatusMessage.textContent = 'Trận đấu đang diễn ra, không thể đặt được nữa!';
         placeBetButton.disabled = true;
       } else if (matchStatus === 'TIMED') {
         betStatusMessage.textContent = 'Trận đấu chưa bắt đầu.';
@@ -86,10 +86,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const homePrediction = parseInt(homePredictionInput.value);
     const awayPrediction = parseInt(awayPredictionInput.value);
 
-    if (!betAmount || !homePrediction || !awayPrediction) {
-      resultMessage.textContent = 'Vui lòng nhập đầy đủ thông tin cược.';
+    if (betAmount == null || homePrediction == null || awayPrediction == null || homePrediction === "" || awayPrediction === "") {
+      resultMessage.textContent = 'Vui lòng nhập đúng thông tin';
       return;
     }
+    
 
     try {
       const response = await fetch('/api/place-bet', {
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       resultMessage.textContent = data.message;
     } catch (error) {
-      console.error('Lỗi khi đặt cược:', error);
+      console.error('Lỗi khi đặt:', error);
       resultMessage.textContent = 'Lỗi khi đặt cược.';
     }
   }
