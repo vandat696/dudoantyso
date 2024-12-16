@@ -16,7 +16,8 @@ body {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px; /* Đảm bảo nội dung không quá rộng trên màn hình lớn */
+  max-width: 460px; /* Đảm bảo kích thước hợp lý cho các màn hình lớn và nhỏ */
+  margin: 20px;
 }
 
 h1 {
@@ -107,12 +108,18 @@ body {
   background-color: #f0f0f0;  /* Nền trang */
 }
 
-.container {
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 460px; /* Mở rộng cho phù hợp */
-  margin: 20px;
+/* Media query để điều chỉnh giao diện trên các màn hình nhỏ */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  #match-info p, #bet-form label {
+    font-size: 1rem;
+  }
 }

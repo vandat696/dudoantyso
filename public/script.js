@@ -1,4 +1,3 @@
-// frontend/script.js
 document.addEventListener('DOMContentLoaded', function () {
   const homeTeamElement = document.getElementById('home-team');
   const awayTeamElement = document.getElementById('away-team');
@@ -16,7 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
   let awayTeamName = 'West Ham United FC';
   let matchStatus = 'TIMED'; 
   let points = 100000; 
-  
+  let userId = localStorage.getItem('userId');
+
+  // Nếu không có userId trong localStorage, tạo một userId ngẫu nhiên
+  if (!userId) {
+    userId = 'user_' + Math.floor(Math.random() * 1000000);  // Tạo userId ngẫu nhiên
+    localStorage.setItem('userId', userId);  // Lưu trữ userId vào localStorage
+  }
+
   function convertUTCToVietnamTime(utcDate) {
     const matchDate = new Date(utcDate);
     matchDate.setHours(matchDate.getHours());  // UTC +7 cho giờ Việt Nam
@@ -63,6 +69,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  async function loadPoints() {
+    try {
+      const response = await fetch(`/api/points/${userId}`);
+      const data = await response.json();
+      points = data.points;
+      pointsElement.textContent = points;
+    } catch (error) {
+      console.error('Lỗi khi lấy điểm người dùng:', error);
+      pointsElement.textContent = 'Lỗi khi lấy điểm.';
+    }
+  }
+
   async function placeBet() {
     const betAmount = parseInt(betAmountInput.value);
     const homePrediction = parseInt(homePredictionInput.value);
@@ -80,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          userId,  // Gửi userId vào body
           betAmount,
           homePrediction,
           awayPrediction,
@@ -98,6 +117,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   placeBetButton.addEventListener('click', placeBet);
+
+  // Cập nhật điểm người dùng khi load trang
+  loadPoints();
 
   // Cập nhật thông tin trận đấu
   updateMatchResult();

@@ -4,7 +4,6 @@ const axios = require('axios');
 const app = express();
 const port = 3000;
 
-
 // API Key từ Football-Data.org
 const apiKey = 'b548fc14d7b84e578424fb428b59ef10';
 
@@ -12,8 +11,8 @@ const apiKey = 'b548fc14d7b84e578424fb428b59ef10';
 app.use(express.static('public'));
 app.use(express.json());  // Để parse JSON body
 
-// Khởi tạo số điểm người dùng (100,000 điểm)
-let points = 100000;
+// Lưu trữ điểm người dùng tạm thời (sử dụng session)
+const session = {}; // Giả sử sử dụng một object để lưu trữ tạm thời điểm của người dùng
 
 // API lấy kết quả trận đấu dựa trên tên đội bóng
 app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
@@ -26,7 +25,6 @@ app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
     });
 
     const matches = response.data.matches;
-   
 
     if (!matches || matches.length === 0) {
       return res.status(404).json({ message: 'Không có trận đấu nào trong danh sách.' });
@@ -58,9 +56,28 @@ app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
   }
 });
 
+// API để lấy số điểm còn lại của người dùng
+app.get('/api/points/:userId', (req, res) => {
+  const { userId } = req.params;
+
+  // Nếu người dùng chưa tồn tại, tạo người dùng mới
+  if (!session[userId]) {
+    session[userId] = { points: 100000 };  // Gán điểm mặc định cho người dùng mới
+  }
+
+  res.json({ points: session[userId].points });
+});
+
 // API để đặt cược
 app.post('/api/place-bet', (req, res) => {
-  const { betAmount, homePrediction, awayPrediction, matchStatus } = req.body;
+  const { userId, betAmount, homePrediction, awayPrediction, matchStatus } = req.body;
+
+  // Kiểm tra nếu người dùng chưa tồn tại, tạo người dùng mới
+  if (!session[userId]) {
+    session[userId] = { points: 100000 };  // Gán điểm mặc định cho người dùng mới
+  }
+
+  let points = session[userId].points;
 
   // Kiểm tra xem người dùng có đủ điểm để đặt cược không
   if (betAmount > points) {
@@ -73,17 +90,12 @@ app.post('/api/place-bet', (req, res) => {
   }
 
   // Giảm số điểm của người dùng theo số tiền cược
-  points -= betAmount;
+  session[userId].points -= betAmount;
 
   res.json({
     message: 'Đặt cược thành công!',
-    remainingPoints: points,
+    remainingPoints: session[userId].points,
   });
-});
-
-// API để lấy số điểm còn lại của người dùng
-app.get('/api/points', (req, res) => {
-  res.json({ points });
 });
 
 // Lắng nghe server
