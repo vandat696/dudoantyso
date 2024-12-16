@@ -1,11 +1,9 @@
+// backend/server.js
 const express = require('express');
 const axios = require('axios');
-const cookieParser = require('cookie-parser'); // Import cookie-parser
 const app = express();
 const port = 3000;
 
-// Sử dụng cookie-parser middleware để đọc cookie
-app.use(cookieParser());
 
 // API Key từ Football-Data.org
 const apiKey = 'b548fc14d7b84e578424fb428b59ef10';
@@ -14,17 +12,12 @@ const apiKey = 'b548fc14d7b84e578424fb428b59ef10';
 app.use(express.static('public'));
 app.use(express.json());  // Để parse JSON body
 
-// Khởi tạo số điểm người dùng (100,000 điểm) - có thể thay đổi tùy vào deviceId
+// Khởi tạo số điểm người dùng (100,000 điểm)
 let points = 100000;
 
 // API lấy kết quả trận đấu dựa trên tên đội bóng
 app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
   const { homeTeam, awayTeam } = req.params;
-  const deviceId = req.cookies.deviceId;  // Lấy deviceId từ cookie
-
-  if (!deviceId) {
-    return res.status(400).json({ message: 'Không tìm thấy deviceId trong cookie.' });
-  }
 
   try {
     // Gọi Football-Data API để lấy thông tin trận đấu
@@ -33,6 +26,7 @@ app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
     });
 
     const matches = response.data.matches;
+   
 
     if (!matches || matches.length === 0) {
       return res.status(404).json({ message: 'Không có trận đấu nào trong danh sách.' });
@@ -53,7 +47,6 @@ app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
         utcDate: match.utcDate,
         score: match.score,
         status: match.status,
-        deviceId,  // Gửi lại deviceId để xác nhận
       });
     } else {
       res.status(404).json({ message: 'Không tìm thấy trận đấu giữa hai đội.' });
@@ -68,11 +61,6 @@ app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
 // API để đặt cược
 app.post('/api/place-bet', (req, res) => {
   const { betAmount, homePrediction, awayPrediction, matchStatus } = req.body;
-  const deviceId = req.cookies.deviceId;  // Lấy deviceId từ cookie
-
-  if (!deviceId) {
-    return res.status(400).json({ message: 'Không tìm thấy deviceId trong cookie.' });
-  }
 
   // Kiểm tra xem người dùng có đủ điểm để đặt cược không
   if (betAmount > points) {
@@ -90,19 +78,12 @@ app.post('/api/place-bet', (req, res) => {
   res.json({
     message: 'Đặt cược thành công!',
     remainingPoints: points,
-    deviceId,  // Gửi lại deviceId để xác nhận
   });
 });
 
 // API để lấy số điểm còn lại của người dùng
 app.get('/api/points', (req, res) => {
-  const deviceId = req.cookies.deviceId;  // Lấy deviceId từ cookie
-
-  if (!deviceId) {
-    return res.status(400).json({ message: 'Không tìm thấy deviceId trong cookie.' });
-  }
-
-  res.json({ points, deviceId });
+  res.json({ points });
 });
 
 // Lắng nghe server

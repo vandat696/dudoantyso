@@ -1,7 +1,11 @@
 const express = require('express');
 const axios = require('axios');
+const cookieParser = require('cookie-parser'); // Import cookie-parser
 const app = express();
 const port = 3000;
+
+// Sử dụng cookie-parser middleware để đọc cookie
+app.use(cookieParser());
 
 // API Key từ Football-Data.org
 const apiKey = 'b548fc14d7b84e578424fb428b59ef10';
@@ -10,12 +14,17 @@ const apiKey = 'b548fc14d7b84e578424fb428b59ef10';
 app.use(express.static('public'));
 app.use(express.json());  // Để parse JSON body
 
-// Khởi tạo số điểm người dùng (100,000 điểm)
+// Khởi tạo số điểm người dùng (100,000 điểm) - có thể thay đổi tùy vào deviceId
 let points = 100000;
 
 // API lấy kết quả trận đấu dựa trên tên đội bóng
 app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
   const { homeTeam, awayTeam } = req.params;
+  const deviceId = req.cookies.deviceId;  // Lấy deviceId từ cookie
+
+  if (!deviceId) {
+    return res.status(400).json({ message: 'Không tìm thấy deviceId trong cookie.' });
+  }
 
   try {
     // Gọi Football-Data API để lấy thông tin trận đấu
@@ -42,12 +51,14 @@ app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
         homeTeam: match.homeTeam.name,
         awayTeam: match.awayTeam.name,
         utcDate: match.utcDate,
-        score: match.score.fullTime,
+        score: match.score,
         status: match.status,
+        deviceId,  // Gửi lại deviceId để xác nhận
       });
     } else {
       res.status(404).json({ message: 'Không tìm thấy trận đấu giữa hai đội.' });
     }
+
   } catch (error) {
     console.error('Lỗi khi gọi API Football-Data:', error.message);
     res.status(500).json({ message: 'Lỗi server khi lấy thông tin trận đấu.' });
@@ -57,29 +68,41 @@ app.get('/api/match-result/:homeTeam/:awayTeam', async (req, res) => {
 // API để đặt cược
 app.post('/api/place-bet', (req, res) => {
   const { betAmount, homePrediction, awayPrediction, matchStatus } = req.body;
+  const deviceId = req.cookies.deviceId;  // Lấy deviceId từ cookie
+
+  if (!deviceId) {
+    return res.status(400).json({ message: 'Không tìm thấy deviceId trong cookie.' });
+  }
 
   // Kiểm tra xem người dùng có đủ điểm để đặt cược không
   if (betAmount > points) {
-    return res.status(400).json({ message: 'Số điểm không đủ để đặt cược!' });
+    return res.status(400).json({ message: 'Số điểm không đủ để đặt!' });
   }
 
   // Kiểm tra trạng thái trận đấu để quyết định có được phép đặt cược hay không
   if (matchStatus === 'IN_PLAY') {
-    return res.status(400).json({ message: 'Không thể đặt cược khi trận đấu đang diễn ra!' });
+    return res.status(400).json({ message: 'Không thể chơi khi trận đấu đang diễn ra!' });
   }
 
   // Giảm số điểm của người dùng theo số tiền cược
   points -= betAmount;
 
-  res.json({ 
+  res.json({
     message: 'Đặt cược thành công!',
     remainingPoints: points,
+    deviceId,  // Gửi lại deviceId để xác nhận
   });
 });
 
 // API để lấy số điểm còn lại của người dùng
 app.get('/api/points', (req, res) => {
-  res.json({ points });
+  const deviceId = req.cookies.deviceId;  // Lấy deviceId từ cookie
+
+  if (!deviceId) {
+    return res.status(400).json({ message: 'Không tìm thấy deviceId trong cookie.' });
+  }
+
+  res.json({ points, deviceId });
 });
 
 // Lắng nghe server
