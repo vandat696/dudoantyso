@@ -70,7 +70,7 @@ app.get('/api/points/:userId', (req, res) => {
 
 // API để đặt cược
 app.post('/api/place-bet', (req, res) => {
-  const { userId, betAmount, homePrediction, awayPrediction, matchStatus } = req.body;
+  const { userId, betAmount, homePrediction, awayPrediction, matchStatus, score } = req.body;
 
   // Kiểm tra nếu người dùng chưa tồn tại, tạo người dùng mới
   if (!session[userId]) {
@@ -86,17 +86,68 @@ app.post('/api/place-bet', (req, res) => {
 
   // Kiểm tra trạng thái trận đấu để quyết định có được phép đặt cược hay không
   if (matchStatus === 'IN_PLAY') {
-    return res.status(400).json({ message: 'Không thể chơi khi trận đấu đang diễn ra!' });
+    return res.status(400).json({ message: 'Không thể đặt khi trận đấu đang diễn ra!' });
+  } else if (matchStatus === 'FINISHED') {
+    return res.status(400).json({ message: 'Không thể đặt khi trận đấu đã kết thúc!' });
   }
 
+  // Nếu trận đấu chưa diễn ra, cho phép người dùng đặt cược
   // Giảm số điểm của người dùng theo số tiền cược
   session[userId].points -= betAmount;
 
+  // Cập nhật dữ liệu cược vào session
+  session[userId].bet = {
+    betAmount,
+    homePrediction,
+    awayPrediction,
+    matchStatus,
+  };
+
   res.json({
-    message: 'Dự đoán thành công!',
+    message: 'Dự đoán thành công! Chờ kết quả trận đấu.',
     remainingPoints: session[userId].points,
   });
 });
+
+app.post('/api/update-match-result', (req, res) => {
+  const { userId, score, homeTeam, awayTeam } = req.body;
+
+  // Kiểm tra xem người dùng có đặt cược không
+  if (!session[userId] || !session[userId].bet) {
+    return res.status(400).json({ message: 'Người dùng chưa đặt hoặc không tồn tại!' });
+  }
+
+  const bet = session[userId].bet;
+  const { betAmount, homePrediction, awayPrediction } = bet;
+
+  // Kiểm tra nếu có tỉ số trận đấu và trạng thái là đã kết thúc
+  if (!score || !score.fullTime.home || !score.fullTime.away) {
+    return res.status(400).json({ message: 'Tỉ số không hợp lệ hoặc trận đấu chưa kết thúc!' });
+  }
+
+  const homeScore = score.fullTime.home;
+  const awayScore = score.fullTime.away;
+
+  let pointsWon = 0;
+
+  // Tính điểm nếu dự đoán chính xác
+  if (homePrediction === homeScore && awayPrediction === awayScore) {
+    pointsWon = betAmount * 2; // Đúng hoàn toàn
+  }
+  // Tính điểm nếu dự đoán gần đúng (sai lệch không quá 1 bàn thắng)
+  else if (Math.abs(homePrediction - homeScore) <= 1 && Math.abs(awayPrediction - awayScore) <= 1) {
+    pointsWon = betAmount; // Dự đoán gần đúng
+  }
+
+  // Cập nhật điểm sau khi trận đấu kết thúc
+  session[userId].points += pointsWon;
+
+  res.json({
+    message: `Trận đấu đã kết thúc! Bạn nhận được ${pointsWon} điểm.`,
+    remainingPoints: session[userId].points,
+  });
+});
+
 
 // Lắng nghe server
 app.listen(port, () => {

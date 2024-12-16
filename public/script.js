@@ -85,13 +85,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const betAmount = parseInt(betAmountInput.value);
     const homePrediction = parseInt(homePredictionInput.value);
     const awayPrediction = parseInt(awayPredictionInput.value);
-
+  
     if (betAmount == null || homePrediction == null || awayPrediction == null || homePrediction === "" || awayPrediction === "") {
-      resultMessage.textContent = 'Vui lòng nhập đúng thông tin';
+      resultMessage.textContent = 'Vui lòng nhập đúng thông tin.';
       return;
     }
-    
-
+  
     try {
       const response = await fetch('/api/place-bet', {
         method: 'POST',
@@ -104,18 +103,20 @@ document.addEventListener('DOMContentLoaded', function () {
           homePrediction,
           awayPrediction,
           matchStatus,
+          score,
         }),
       });
       const data = await response.json();
       points = data.remainingPoints;
       pointsElement.textContent = points;
-
+  
       resultMessage.textContent = data.message;
     } catch (error) {
       console.error('Lỗi khi đặt:', error);
-      resultMessage.textContent = 'Lỗi khi đặt cược.';
+      resultMessage.textContent = 'Lỗi khi đặt.';
     }
   }
+  
 
   placeBetButton.addEventListener('click', placeBet);
 
