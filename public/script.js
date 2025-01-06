@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const awayPredictionInput = document.getElementById('away-prediction');
   const placeBetButton = document.getElementById('place-bet');
 
-  let homeTeamName = 'Brentford FC'; 
-  let awayTeamName = 'Arsenal FC';
+  let homeTeamName = 'Wolverhampton Wanderers FC'; 
+  let awayTeamName = 'Nottingham Forest FC';
   let matchStatus = 'TIMED'; 
   let points = 100000; 
   let userId = localStorage.getItem('userId');

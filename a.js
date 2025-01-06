@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const awayPredictionInput = document.getElementById('away-prediction');
     const placeBetButton = document.getElementById('place-bet');
   
-    let homeTeamName = 'Chelsea FC'; 
-    let awayTeamName = 'Brentford FC';
+    let homeTeamName = 'Wolverhampton Wanderers FC'; 
+    let awayTeamName = 'Nottingham Forest FC';
     let matchStatus = 'TIMED'; 
     let points = 100000; 
     
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const awayPrediction = parseInt(awayPredictionInput.value);
   
       if (!betAmount || !homePrediction || !awayPrediction) {
-        resultMessage.textContent = 'Vui lòng nhập đầy đủ thông tin cược.';
+        resultMessage.textContent = 'Vui lòng nhập đầy đủ thông tin.';
         return;
       }
   
@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', function () {
   
         resultMessage.textContent = data.message;
       } catch (error) {
-        console.error('Lỗi khi đặt cược:', error);
-        resultMessage.textContent = 'Lỗi khi đặt cược.';
+        console.error('Lỗi khi đặt:', error);
+        resultMessage.textContent = 'Lỗi khi đặt.';
       }
     }
   
