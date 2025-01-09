@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const awayPredictionInput = document.getElementById('away-prediction');
   const placeBetButton = document.getElementById('place-bet');
 
-  let homeTeamName = 'Fulham FC'; 
-  let awayTeamName = 'Watford FC';
+  let homeTeamName = 'Real Madrid CF'; 
+  let awayTeamName = 'RCD Mallorca';
   let matchStatus = 'TIMED'; 
   let points = 100000; 
   let userId = localStorage.getItem('userId');
