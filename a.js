@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const awayPredictionInput = document.getElementById('away-prediction');
     const placeBetButton = document.getElementById('place-bet');
   
-    let homeTeamName = 'Real Madrid CF'; 
-    let awayTeamName = 'RCD Mallorca';
+    let homeTeamName = 'Sheffield United FC'; 
+    let awayTeamName = 'Cardiff City FC';
     let matchStatus = 'TIMED'; 
     let points = 100000; 
     
