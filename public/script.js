@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const awayPredictionInput = document.getElementById('away-prediction');
   const placeBetButton = document.getElementById('place-bet');
 
-  let homeTeamName = 'Borussia Dortmund'; 
-  let awayTeamName = 'Bayer 04 Leverkusen';
+  let homeTeamName = 'Paris Saint-Germain FC'; 
+  let awayTeamName = 'AS Saint-Étienne';
   let matchStatus = 'TIMED'; 
   let points = 100000; 
   let userId = localStorage.getItem('userId');
