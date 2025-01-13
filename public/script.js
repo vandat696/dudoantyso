@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const awayPredictionInput = document.getElementById('away-prediction');
   const placeBetButton = document.getElementById('place-bet');
 
-  let homeTeamName = 'Paris Saint-Germain FC'; 
-  let awayTeamName = 'AS Saint-Étienne';
+  let homeTeamName = 'Real Sociedad de Fútbol'; 
+  let awayTeamName = 'Villarreal CF';
   let matchStatus = 'TIMED'; 
   let points = 100000; 
   let userId = localStorage.getItem('userId');
